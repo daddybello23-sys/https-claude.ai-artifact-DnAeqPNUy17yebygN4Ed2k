@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>I will be there: Annual Mentorship Forum flyer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&display=swap">
+<style>
+:root{--bg:#F3EBD8;--ink:#121A3F;--card:#fff;--line:#d9ccae;--indigo:#1E2A5E;--ochre:#E3A72F;--muted:#4b5275;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1233;--ink:#f3ebd8;--card:#161e4a;--line:#2c3772;--muted:#b9bfdc}}
+:root[data-theme="dark"]{--bg:#0d1233;--ink:#f3ebd8;--card:#161e4a;--line:#2c3772;--muted:#b9bfdc}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 18px 40px;display:grid;gap:28px;grid-template-columns:1fr}
+@media(min-width:820px){main{grid-template-columns:340px 1fr;align-items:start;padding-top:48px}}
+h1{font:800 clamp(34px,6vw,48px)/1.05 "Bricolage Grotesque",Georgia,serif;margin:0 0 10px;letter-spacing:-.01em}
+p{margin:0 0 18px;color:var(--muted);max-width:44ch}
+label{display:block;font-weight:600;margin:0 0 6px}
+input[type=text]{width:100%;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+input[type=file]{width:100%;font:inherit;color:var(--ink)}
+.field{margin-bottom:18px}
+button{font:700 17px "Bricolage Grotesque",system-ui,sans-serif;padding:14px 20px;border:0;border-radius:10px;background:var(--indigo);color:#fff;cursor:pointer;width:100%}
+button:hover{background:#2a3a7e}
+:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+#msg{min-height:1.5em;margin:12px 0 0;font-size:14px}
+.preview{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px}
+canvas{display:block;width:100%;height:auto;border-radius:8px}
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <h1>I will be there</h1>
+    <p>Make your flyer for the Annual Mentorship Forum, 12 Dec, Kano. Add your name and photo, then save it and share it.</p>
+    <div class="field">
+      <label for="name">Your name</label>
+      <input type="text" id="name" maxlength="40" placeholder="Type your name" autocomplete="name">
+    </div>
+    <div class="field">
+      <label for="photo">Your photo</label>
+      <input type="file" id="photo" accept="image/*">
+    </div>
+    <button id="save" type="button">Save my flyer</button>
+    <p id="msg" role="status"></p>
+  </section>
+  <section class="preview">
+    <canvas id="c" width="1080" height="1350" aria-label="Flyer preview"></canvas>
+  </section>
+</main>
+<script>
+(function(){
+var W=1080,H=1350,cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var nameEl=document.getElementById('name'),photoEl=document.getElementById('photo'),msg=document.getElementById('msg');
+var img=null,HEAD='"Bricolage Grotesque",Georgia,serif';
+
+function fit(text,weight,max,width){
+  var s=max;ctx.font=weight+' '+s+'px '+HEAD;
+  while(ctx.measureText(text).width>width&&s>24){s-=2;ctx.font=weight+' '+s+'px '+HEAD;}
+  return s;
+}
+function draw(){
+  var nm=(nameEl.value||'').trim()||'Your name';
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#1E2A5E';ctx.fillRect(0,0,W,H);
+  // diamond lattice
+  ctx.strokeStyle='rgba(243,235,216,.09)';ctx.lineWidth=2;
+  for(var x=-H;x<W+H;x+=90){
+    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+H,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x,H);ctx.lineTo(x+H,0);ctx.stroke();
+  }
+  ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  // header
+  ctx.fillStyle='#F3EBD8';
+  var hs=fit('Annual Mentorship Forum',800,64,920);
+  ctx.fillText('Annual Mentorship Forum',W/2,130);
+  // photo
+  var cx=W/2,cy=520,r=270;
+  ctx.beginPath();ctx.arc(cx,cy,r+18,0,Math.PI*2);ctx.fillStyle='#E3A72F';ctx.fill();
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+  if(img){
+    var sc=Math.max(2*r/img.width,2*r/img.height),w=img.width*sc,h=img.height*sc;
+    ctx.drawImage(img,cx-w/2,cy-h/2,w,h);
+  }else{
+    ctx.fillStyle='#121A3F';ctx.fillRect(cx-r,cy-r,2*r,2*r);
+    ctx.fillStyle='#E3A72F';ctx.font='800 220px '+HEAD;ctx.textBaseline='middle';
+    ctx.fillText(nm.charAt(0).toUpperCase(),cx,cy+10);ctx.textBaseline='alphabetic';
+  }
+  ctx.restore();
+  // message and name
+  ctx.fillStyle='#fff';ctx.font='800 132px '+HEAD;
+  ctx.fillText('I will be there',W/2,940);
+  ctx.fillStyle='#E3A72F';fit(nm,800,76,900);
+  ctx.fillText(nm,W/2,1040);
+  // info band
+  ctx.fillStyle='#E3A72F';ctx.fillRect(0,1140,W,210);
+  ctx.fillStyle='#121A3F';ctx.font='800 84px '+HEAD;
+  ctx.fillText('12 Dec, Kano',W/2,1262);
+}
+nameEl.addEventListener('input',draw);
+photoEl.addEventListener('change',function(){
+  var f=photoEl.files&&photoEl.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){var im=new Image();im.onload=function(){img=im;draw();};im.src=rd.result;};
+  rd.readAsDataURL(f);
+});
+document.getElementById('save').addEventListener('click',function(){
+  msg.textContent='';
+  cv.toBlob(function(blob){
+    if(!blob){msg.textContent='Could not save the flyer. Take a screenshot instead.';return;}
+    var fn=((nameEl.value||'').trim()||'my').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-flyer.png';
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+    msg.textContent='Flyer saved. Check your Downloads folder.';
+  },'image/png');
+});
+draw();
+if(document.fonts&&document.fonts.load){
+  Promise.all([document.fonts.load('800 60px "Bricolage Grotesque"')]).then(draw,draw);
+}
+})();
+</script>
+</body>
+</html>
